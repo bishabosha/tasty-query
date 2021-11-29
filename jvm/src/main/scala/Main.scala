@@ -1,7 +1,8 @@
 import java.nio.file.{Files, Paths}
-import tastyquery.reader.TastyUnpickler
+import tastyquery.reader.{TastyUnpickler, TastyFile}
 import tastyquery.Contexts
 import tastyquery.api.ProjectReader
+import tastyquery.ast.Names.TermName
 
 import java.net.URL
 import java.net.URLClassLoader
@@ -19,10 +20,13 @@ object Main {
         val reader = new ProjectReader
         reader.read(classpath)
       case "--standalone" :: filename :: Nil =>
-        val unpickler = new TastyUnpickler(Files.readAllBytes(Paths.get(filename)))
-        println(
-          unpickler.unpickle(new TastyUnpickler.TreeSectionUnpickler()).get.unpickle(using Contexts.empty(filename))
-        )
+        val tasty = IArray.unsafeFromArray(Files.readAllBytes(Paths.get(filename)))
+        val trees =
+          for
+            given TastyFile <- TastyUnpickler.unpickleFile(tasty)
+            treeunpickler <- TastyUnpickler.unpickleTrees
+          yield treeunpickler.unpickle(using Contexts.empty(filename))
+        println(trees.toTry.get)
       case _ =>
         println("""Two modes of usage:
                   |--standalone tasty-file

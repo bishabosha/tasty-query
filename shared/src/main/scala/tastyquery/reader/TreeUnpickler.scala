@@ -7,9 +7,14 @@ import tastyquery.ast.Symbols.{ClassSymbol, ClassSymbolFactory, NoSymbol, Regula
 import tastyquery.ast.Trees.*
 import tastyquery.ast.TypeTrees.*
 import tastyquery.ast.Types.*
-import tastyquery.reader.TastyUnpickler.NameTable
+import tastyquery.util.{Ref, tagged}, tagged.@@
+import tastyquery.reader.TastyFile.tfile
+
+import tastyquery.reader.NameMap
 
 import scala.annotation.tailrec
+import scala.annotation.constructorOnly
+
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import dotty.tools.tasty.{TastyBuffer, TastyFormat, TastyReader}
@@ -22,7 +27,12 @@ sealed trait AbstractCaseDefFactory[CaseDefType]
 case object CaseDefFactory extends AbstractCaseDefFactory[CaseDef]
 case object TypeCaseDefFactory extends AbstractCaseDefFactory[TypeCaseDef]
 
-class TreeUnpickler(protected val reader: TastyReader, nameAtRef: NameTable) {
+object TreeUnpickler:
+  def make(reader: Ref[TastyReader] @@ StdSection.ASTs)(using TastyFile): TreeUnpickler =
+    TreeUnpickler(reader.untagged.fork, tfile.names)
+
+class TreeUnpickler private (protected val reader: TastyReader, nameAtRef: NameMap[TermName]) {
+
   def unpickle(using FileContext): List[Tree] = {
     @tailrec def read(acc: ListBuffer[Tree]): List[Tree] = {
       acc += readTopLevelStat
