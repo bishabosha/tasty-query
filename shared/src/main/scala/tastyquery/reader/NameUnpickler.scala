@@ -3,7 +3,7 @@ package tastyquery.reader
 import tastyquery.util.{Ref, CanShare, tagged}, CanShare.given, tagged.*
 import tastyquery.ast.Names.*
 import tastyquery.ast.Signature
-import tastyquery.ast.{ParamSig, TermSig, TypeLenSig}
+import tastyquery.ast.ParamSig
 
 import scala.collection.mutable
 import dotty.tools.tasty.{TastyReader, TastyHeaderUnpickler}
@@ -52,10 +52,8 @@ object NameUnpickler {
 
     def readParamSig(): ParamSig = {
       val ref = readInt()
-      if (ref < 0)
-        TypeLenSig(ref.abs)
-      else
-        TermSig(nameTable(NameRef(ref)).toTypeName)
+      if ref < 0 then ParamSig.TyParamLen(ref.abs)
+      else ParamSig.ParamName(nameTable(NameRef(ref)).toTypeName)
     }
 
     def readNameContents(): TermName = {

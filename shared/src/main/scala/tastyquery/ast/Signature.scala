@@ -2,10 +2,8 @@ package tastyquery.ast
 
 import tastyquery.ast.Names.TypeName
 
-abstract class ParamSig
-
-case class TermSig(typ: TypeName) extends ParamSig
-
-case class TypeLenSig(len: Int) extends ParamSig
+enum ParamSig:
+  case ParamName(typ: TypeName)
+  case TyParamLen(len: Int)
 
 case class Signature(paramsSig: List[ParamSig], resSig: TypeName)
