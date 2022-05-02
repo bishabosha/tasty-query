@@ -4,7 +4,7 @@ import scala.collection.mutable
 import tastyquery.ast.Names.{Name, TermName, SignedName, SimpleName, QualifiedName, TypeName, SuffixedName, nme}
 import dotty.tools.tasty.TastyFormat.NameTags
 import tastyquery.ast.Trees.{DefTree, Tree, DefDef}
-import tastyquery.ast.Flags, Flags.FlagSet
+import tastyquery.ast.Flags.FlagSet
 import tastyquery.ast.Types.*
 import tastyquery.Contexts.{BaseContext, baseCtx}
 

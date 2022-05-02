@@ -72,8 +72,9 @@ object ClassfileParser {
     def loadMethods(methods: Forked[DataStream]): IndexedSeq[(Symbol, SigOrDesc)] =
       methods.use {
         val buf = IndexedSeq.newBuilder[(Symbol, SigOrDesc)]
+        val methodFlags = Flags.EmptyFlagSet | Flags.Method
         reader.readMethods { (name, sigOrDesc) =>
-          val sym = clsCtx.createSymbol(name, RegularSymbolFactory, addToDecls = true).withFlags(Flags.Method)
+          val sym = clsCtx.createSymbol(name, RegularSymbolFactory, addToDecls = true).withFlags(methodFlags)
           buf += sym -> sigOrDesc
         }
         buf.result()
